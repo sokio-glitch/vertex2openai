@@ -148,7 +148,12 @@ class OpenAIDirectHandler:
             {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": safety_threshold},
             {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": safety_threshold},
             {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": safety_threshold},
-            {"category": 'HARM_CATEGORY_CIVIC_INTEGRITY', "threshold": safety_threshold}
+            {"category": 'HARM_CATEGORY_CIVIC_INTEGRITY', "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_UNSPECIFIED", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_IMAGE_HATE", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_IMAGE_DANGEROUS_CONTENT", "threshold": safety_threshold},
+            {"category": "HARM_CATEGORY_IMAGE_HARASSMENT", "threshold": safety_threshold},
+            {"category": 'HARM_CATEGORY_IMAGE_SEXUALLY_EXPLICIT', "threshold": safety_threshold}
         ]
 
     def create_openai_client(self, project_id: str, gcp_token: str, location: str = "global") -> openai.AsyncOpenAI:
