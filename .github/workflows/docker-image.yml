@@ -1,5 +1,7 @@
 name: GHCR CI
-permissions: write-all
+permissions:
+  packages: write
+  contents: read
 on:
   push:
     branches: [ "main" ]
