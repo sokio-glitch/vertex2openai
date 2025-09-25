@@ -1,3 +1,7 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()  # 加载 .env 文件
+
 from fastapi import FastAPI, Depends # Depends might be used by root endpoint
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -28,7 +32,7 @@ express_key_manager = ExpressKeyManager()
 app.state.express_key_manager = express_key_manager # Store express key manager on app state
 
 # Include API routers
-app.include_router(models_api.router) 
+app.include_router(models_api.router)
 app.include_router(chat_api.router)
 
 @app.on_event("startup")

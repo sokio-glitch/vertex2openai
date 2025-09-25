@@ -57,6 +57,14 @@ class ExpressKeyManager:
         key = self.express_keys[self.round_robin_index]
         original_idx = self.round_robin_index
         
+        # Mask the key to show only first 4 and last 3 characters
+        if len(key) > 7:  # Only mask if key is long enough to have 4+3 chars
+            masked_key = f"{key[:4]}...{key[-3:]}"
+        else:
+            masked_key = key  # If too short, show as is
+            
+        print(f"信息: 正在轮询使用第 {original_idx + 1} 个Express API密钥 (已屏蔽显示: {masked_key})")
+        
         # Move to next index for next call
         self.round_robin_index = (self.round_robin_index + 1) % len(self.express_keys)
         

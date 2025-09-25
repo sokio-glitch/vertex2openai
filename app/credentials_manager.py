@@ -287,6 +287,8 @@ class CredentialManager:
         if self.round_robin_index >= len(all_sources):
             self.round_robin_index = 0
         
+        print(f"信息: 当前轮询索引: {self.round_robin_index}")
+        
         # Create ordered list starting from round_robin_index
         ordered_sources = all_sources[self.round_robin_index:] + all_sources[:self.round_robin_index]
         
@@ -294,10 +296,44 @@ class CredentialManager:
         self.round_robin_index = (self.round_robin_index + 1) % len(all_sources)
         
         # Try credentials in round-robin order
-        for source_info in ordered_sources:
-            credentials, project_id = self._load_credential_from_source(source_info)
-            if credentials and project_id:
-                return credentials, project_id
+        for idx, source_info in enumerate(ordered_sources):
+            # Handle different source types differently for logging
+            if source_info['type'] == 'file':
+                source_name = os.path.basename(source_info['value'])
+                print(f"信息: 正在轮询使用第 {idx + 1} 个服务账户凭证文件: {source_name}")
+                credentials, project_id = self._load_credential_from_source(source_info)
+                if credentials and project_id:
+                    print(f"信息: 已成功获取服务账户凭证 - 项目ID: {project_id}")
+                    return credentials, project_id
+            elif source_info['type'] == 'memory_object':
+                # For in-memory credentials, we'll get the original index to display
+                original_idx = source_info.get('original_index', idx)
+                mem_cred_detail = source_info['value']
+                project_id = mem_cred_detail.get('project_id', 'Unknown')
+                
+                # Get the original JSON object to access private_key safely
+                original_json = next(
+                    (cred for cred in self.in_memory_credentials if 
+                     cred.get('project_id') == project_id and 
+                     cred.get('source') == 'json_string'), 
+                    None
+                )
+                
+                if original_json:
+                    # Access the private_key from the original JSON data
+                    private_key = original_json.get('private_key', '')
+                    if private_key and len(private_key) > 7:
+                        masked_key = f"{private_key[:4]}...{private_key[-3:]}"
+                        print(f"信息: 正在轮询使用第 {original_idx + 1} 个内存凭证 (项目ID: {project_id}, 已屏蔽私钥显示: {masked_key})")
+                    else:
+                        print(f"信息: 正在轮询使用第 {original_idx + 1} 个内存凭证 (项目ID: {project_id})")
+                else:
+                    print(f"信息: 正在轮询使用第 {original_idx + 1} 个内存凭证 (项目ID: {project_id})")
+                
+                credentials, project_id = self._load_credential_from_source(source_info)
+                if credentials and project_id:
+                    print(f"信息: 已成功获取内存凭证 - 项目ID: {project_id}")
+                    return credentials, project_id
         
         print("WARNING: All available credential sources failed to load.")
         return None, None
