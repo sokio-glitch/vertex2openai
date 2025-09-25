@@ -1,6 +1,4 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()  # 加载 .env 文件
 
 from fastapi import FastAPI, Depends # Depends might be used by root endpoint
 from fastapi.middleware.cors import CORSMiddleware
