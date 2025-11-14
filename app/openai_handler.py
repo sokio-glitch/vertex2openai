@@ -142,7 +142,7 @@ class OpenAIDirectHandler:
     def __init__(self, credential_manager=None, express_key_manager=None):
         self.credential_manager = credential_manager
         self.express_key_manager = express_key_manager
-        safety_threshold = "BLOCK_NONE" if app_config.SAFETY_SCORE else "OFF"
+        safety_threshold = "BLOCK_NONE"
         self.safety_settings = [
             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": safety_threshold},
             {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": safety_threshold},
