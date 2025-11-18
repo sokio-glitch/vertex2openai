@@ -263,6 +263,7 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
                 # Ensure thinking_config is a dictionary before updating
                 if not isinstance(gen_config_dict.get("thinking_config"), dict):
                     gen_config_dict["thinking_config"] = {}
+                gen_config_dict["thinking_config"]["include_thoughts"] = True
                 gen_config_dict["thinking_config"]["thinking_budget"] = budget
                 if "gemini-2.5-flash-lite" in base_model_name and is_max_thinking_model:
                     gen_config_dict["thinking_config"]["include_thoughts"] = True
