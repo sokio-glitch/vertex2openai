@@ -256,9 +256,9 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
             # If specific overrides are needed here, they would modify gen_config_dict.
             if is_nothinking_model or is_max_thinking_model:
                 if is_nothinking_model:
-                    budget = 128 if "gemini-2.5-pro" in base_model_name else 0
+                    budget = 128 if ("gemini-2.5-pro" in base_model_name or "gemini-3-pro" in base_model_name) else 0
                 else:  # is_max_thinking_model
-                    budget = 32768 if "gemini-2.5-pro" in base_model_name else 24576
+                    budget = 32768 if ("gemini-2.5-pro" in base_model_name or "gemini-3-pro" in base_model_name) else 24576
 
                 # Ensure thinking_config is a dictionary before updating
                 if not isinstance(gen_config_dict.get("thinking_config"), dict):
@@ -266,8 +266,12 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
                 gen_config_dict["thinking_config"]["thinking_budget"] = budget
                 if "gemini-2.5-flash-lite" in base_model_name and is_max_thinking_model:
                     gen_config_dict["thinking_config"]["include_thoughts"] = True
-                if budget == 0:
+                elif budget == 0:
                     gen_config_dict["thinking_config"]["include_thoughts"] = False
+                elif "gemini-2.5-flash-lite" in base_model_name:
+                    gen_config_dict["thinking_config"]["include_thoughts"] = False
+                else:
+                    gen_config_dict["thinking_config"]["include_thoughts"] = True
 
             return await execute_gemini_call(client_to_use, base_model_name, current_prompt_func, gen_config_dict, request)
 
