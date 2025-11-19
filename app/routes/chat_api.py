@@ -249,6 +249,18 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
             elif is_encrypted_full_model:
                 current_prompt_func = create_encrypted_full_gemini_prompt
             
+            # Ensure thinking_config is a dictionary before updating
+            if not isinstance(gen_config_dict.get("thinking_config"), dict):
+                gen_config_dict["thinking_config"] = {}
+
+            gen_config_dict["thinking_config"]["include_thoughts"] = True
+            
+            if "gemini-2.5-flash-lite" in base_model_name and is_max_thinking_model:
+                gen_config_dict["thinking_config"]["include_thoughts"] = True
+            elif "gemini-2.5-flash-lite" in base_model_name:
+                gen_config_dict["thinking_config"]["include_thoughts"] = False
+            else:
+                gen_config_dict["thinking_config"]["include_thoughts"] = True
             # For -nothinking or -max, the thinking_config is already set in create_generation_config
             # or can be adjusted here if needed, but it's part of the dictionary.
             # Example: if is_nothinking_model: gen_config_dict["thinking_config"] = {"thinking_budget": 0}
@@ -256,16 +268,10 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
             # If specific overrides are needed here, they would modify gen_config_dict.
             if is_nothinking_model or is_max_thinking_model:
                 if is_nothinking_model:
-                    budget = 128 if "gemini-2.5-pro" in base_model_name else 0
+                    budget = 128 if ("gemini-2.5-pro" in base_model_name or "gemini-3-pro" in base_model_name) else 0
                 else:  # is_max_thinking_model
-                    budget = 32768 if "gemini-2.5-pro" in base_model_name else 24576
-
-                # Ensure thinking_config is a dictionary before updating
-                if not isinstance(gen_config_dict.get("thinking_config"), dict):
-                    gen_config_dict["thinking_config"] = {}
+                    budget = 32768 if ("gemini-2.5-pro" in base_model_name or "gemini-3-pro" in base_model_name) else 24576
                 gen_config_dict["thinking_config"]["thinking_budget"] = budget
-                if "gemini-2.5-flash-lite" in base_model_name and is_max_thinking_model:
-                    gen_config_dict["thinking_config"]["include_thoughts"] = True
                 if budget == 0:
                     gen_config_dict["thinking_config"]["include_thoughts"] = False
 
