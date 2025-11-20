@@ -257,7 +257,7 @@ async def chat_completions(fastapi_request: Request, request: OpenAIRequest, api
             
             if "gemini-2.5-flash-lite" in base_model_name and is_max_thinking_model:
                 gen_config_dict["thinking_config"]["include_thoughts"] = True
-            elif "gemini-2.5-flash-lite" in base_model_name:
+            elif "gemini-2.5-flash-lite" in base_model_name or "image" in base_model_name:
                 gen_config_dict["thinking_config"]["include_thoughts"] = False
             else:
                 gen_config_dict["thinking_config"]["include_thoughts"] = True
