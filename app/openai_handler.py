@@ -282,12 +282,12 @@ class OpenAIDirectHandler:
                                 del delta['extra_content']
                             
                             content = delta.get('content', '')
+                            original_choice = chunk_as_dict['choices'][0]
                             if content:
                                 # Use the processor to extract reasoning
                                 processed_content, current_reasoning = reasoning_processor.process_chunk(content)
                                 
                                 # Send chunks for both reasoning and content as they arrive
-                                original_choice = chunk_as_dict['choices'][0]
                                 original_finish_reason = original_choice.get('finish_reason')
                                 original_usage = original_choice.get('usage')
 
